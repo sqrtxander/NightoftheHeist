@@ -11,7 +11,11 @@ level = 0
 
 
 def help_():
-    pass
+    pass  # TODO
+
+
+def rules():
+    print('Here are the rules')  # TODO
 
 
 def parse_inp(inp):  # TODO
@@ -43,7 +47,29 @@ def parse_inp(inp):  # TODO
             print(f'Unknown object {noun}')
 
 
+def main():
+    print('Welcome to Night of the Heist.')
+    sleep(1.5)
+    print('When you see the following line:')
+    sleep(1.5)
+    print('>')
+    sleep(1.5)
+    print('you are being prompted to input something.')
+    sleep(1.5)
+    print('''If at any point during the game you don't know what you are doing,
+you can simply input the phrase "help" when you are able to.''')
+    sleep(3)
+    print('''For the rules of the game, enter the phrase "rules", 
+otherwise, if you know what you're doing, press enter.''')
+
+    response = input('>')
+    if 'rules' in response.lower():
+        rules()
+
+
 if __name__ == '__main__':  # currently test code
+
+    main()
 
     while True:
         response = input()
