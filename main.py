@@ -2,16 +2,31 @@
 from time import sleep
 
 # variables
-inventory = ['stone']
+inventory = ['rock']
 actions = ('walk', 'grab', 'view', 'use')
-objects = [['stone', 'key'],  # level 0 objects
+objects = [['rock', 'key'],  # level 0 objects
            ['bag', 'soap']]  # level 1 objects
-plx, ply = 0, 0  # player's x and y coordiates
+plx, ply = 0, 0  # player's x and y coordinates
 level = 0
 
 
 def help_():
-    pass  # TODO
+    # TODO
+    print('When you see the following line:')
+    print('>')
+    print('you are being prompted to input something.')
+    sleep(2)
+    print('''For the best chance that your input is understood, use a two word input
+with the first word being an action and the second word being the subject.
+e.g. grab rock, use glass''')
+    sleep(2)
+    print('''For a list of the recognised actions, type \'actions\'''')
+
+
+def verbs():
+    print('The recognised verbs are:')
+    for i in actions:
+        print(i)
 
 
 def rules():
@@ -22,7 +37,7 @@ def parse_inp(inp):  # TODO
     if 'help' in inp.lower():
         help_()
     elif 'inventory' in inp.lower():
-        print('The items in your inventoiry are:')
+        print('The items in your inventory are:')
         for i in inventory:
             print(i)
 
