@@ -1,14 +1,6 @@
 # imports
 from time import sleep
 
-# variables
-inventory = ['rock']
-actions = ('walk', 'grab', 'view', 'use')
-objects = [['rock', 'key'],  # level 0 objects
-           ['bag', 'soap']]  # level 1 objects
-plx, ply = 0, 0  # player's x and y coordinates
-level = 0
-
 
 def help_():
     # TODO
@@ -26,8 +18,10 @@ e.g. grab rock, use glass''')
 class Game:
 
     def __init__(self):
+        self.action = None
+        self.noun = None
         self.response = None
-        self.inventory = ['rock']
+        self.inventory = []
         self.actions = ('walk', 'grab', 'view', 'use')
         self.objects = [['rock', 'key'],  # level 0 objects
                         ['bag', 'soap']]  # level 1 objects
@@ -35,6 +29,22 @@ class Game:
         self.level = 0
 
         self.main()
+
+    def grab(self):
+        if self.noun in self.objects[self.level]:
+            self.objects[self.level].remove(self.noun)
+            self.inventory.append(self.noun)
+            print()
+        else:  # if the object isn't recognised
+            print(f'Unknown object {self.noun}')
+
+    def print_inventory(self):
+        if not self.inventory:  # if inventory is empty
+            print('There are no items in your inventory.')
+        else:
+            print('The items currently in your inventory are:')
+            for i in self.inventory:
+                print(i)
 
     def verbs(self):
         print('The recognised verbs are:')
@@ -45,29 +55,23 @@ class Game:
         if 'help' in self.response.lower():
             help_()
         elif 'inventory' in self.response.lower():
-            print('The items in your inventory are:')
-            for i in inventory:
-                print(i)
+            self.print_inventory()
+            return  # stop the rest of the function from executing
 
         response_list = self.response.lower().strip().split(' ')  # get a list of the words in the input
 
         try:
-            action = response_list[0]
-            noun = response_list[1]
+            self.action = response_list[0]
+            self.noun = response_list[1]
         except IndexError:  # if there is less than 2 words in the input
-            print(f'Unknown action {self.response}.')
-            return  # stops the rest of the function from executing
+            print(f'Unknown action {self.response}')
+            return  # stop the rest of the function from executing
 
-        if action not in self.actions:
-            print(f'Unknown action {action}.')
+        if self.action not in self.actions:
+            print(f'Unknown action {self.action}')
 
-        elif action == 'grab':  # grab action moves object from the specific levels list to players inventory
-            if noun in objects[level]:
-                objects[level].remove(noun)
-                inventory.append(noun)
-
-            else:  # if the object isn't recognised
-                print(f'Unknown object {noun}')
+        elif self.action == 'grab':  # grab action moves object from the specific levels list to players inventory
+            self.grab()
 
     def main(self):
         print('Welcome to Night of the Heist.')
