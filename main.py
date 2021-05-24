@@ -19,24 +19,54 @@ class Game:
 
     def __init__(self):
         self.action = None
-        self.noun = None
+        self.obj = None
         self.response = None
         self.inventory = []
-        self.actions = ('walk', 'grab', 'view', 'use')
+        self.actions = ('walk', 'grab', 'drop', 'use')
         self.objects = [['rock', 'key'],  # level 0 objects
                         ['bag', 'soap']]  # level 1 objects
-        self.plx, ply = 0, 0  # player's x and y coordinates
+        self.plx, self.ply = 0, 0  # player's x and y coordinates
         self.level = 0
 
-        self.main()
+    def walk(self):
 
-    def grab(self):
-        if self.noun in self.objects[self.level]:
-            self.objects[self.level].remove(self.noun)
-            self.inventory.append(self.noun)
-            print()
-        else:  # if the object isn't recognised
-            print(f'Unknown object {self.noun}')
+        map_spaces = ((0, 0), (0, 1), (-1, 1), (1, 1))
+
+        dirs = {'up': (0, 1), 'right': (1, 0),
+                'down': (0, -1), 'left': (-1, 0)}
+
+        if self.obj not in dirs:
+            print(f'Unknown direction {self.obj}')
+
+        else:
+            dx, dy = dirs[self.obj]
+            if (self.plx + dx, self.ply + dy) in map_spaces:
+                self.plx += dx
+                self.ply += dy
+                print(f'You walked {self.obj}')
+                print((self.plx, self.ply))
+            else:
+                print('You walked into a wall.')
+
+    def grab(self):  # grab action moves object from the areas object list to players inventory
+        if self.obj in self.objects[self.level]:  # if the object is in the room
+            self.objects[self.level].remove(self.obj)
+            self.inventory.append(self.obj)
+            print(f'You picked up {self.obj}.')
+        else:  # if the object isn't there to grab.
+            print(f'There isn\'t "{self.obj}" in the area')
+
+    def drop(self):  # drop action moves object from your inventory to the areas object list
+        if self.obj in self.inventory:  # if the object is in your inventory
+            self.objects[self.level].append(self.obj)
+            self.inventory.remove(self.obj)
+            print(f'You dropped {self.obj}')
+        else:
+            print(f'There isn\'t "{self.obj}" in your inventory')
+
+    def use(self):
+        # TODO
+        pass
 
     def print_inventory(self):
         if not self.inventory:  # if inventory is empty
@@ -62,7 +92,7 @@ class Game:
 
         try:
             self.action = response_list[0]
-            self.noun = response_list[1]
+            self.obj = response_list[1]
         except IndexError:  # if there is less than 2 words in the input
             print(f'Unknown action {self.response}')
             return  # stop the rest of the function from executing
@@ -70,31 +100,35 @@ class Game:
         if self.action not in self.actions:
             print(f'Unknown action {self.action}')
 
-        elif self.action == 'grab':  # grab action moves object from the specific levels list to players inventory
+        elif self.action == 'grab':
             self.grab()
 
-    def main(self):
-        print('Welcome to Night of the Heist.')
-        sleep(1.5)
-        print('When you see the following line:')
-        sleep(1.5)
-        print('>')
-        sleep(1.5)
-        print('you are being prompted to input something.')
-        sleep(1.5)
-        print('''If at any point during the game you don't know what you are doing,
-you can simply input the phrase "help" when you are able to.''')
-        sleep(3)
-        print('''if you would like help now, enter the phrase "help", 
-otherwise, if you know what you're doing, press enter.''')
+        elif self.action == 'drop':
+            self.drop()
 
-        self.response = input('>')
-        self.parse_inp()
+        elif self.action == 'walk':
+            self.walk()
+
+    def main(self):
+#         print('Welcome to Night of the Heist.')
+#         sleep(1.5)
+#         print('When you see the following line:')
+#         sleep(1.5)
+#         print('>')
+#         sleep(1.5)
+#         print('you are being prompted to input something.')
+#         sleep(1.5)
+#         print('''If at any point during the game you don't know what you are doing,
+# you can simply input the phrase "help" when you are able to.''')
+#         sleep(3)
+#         print('''if you would like help now, enter the phrase "help",
+# otherwise, if you know what you're doing, press enter.''')
+
         while True:
             self.response = input('>')
             self.parse_inp()
 
 
-if __name__ == '__main__':  # currently test code
-
+if __name__ == '__main__':
     game = Game()
+    game.main()
