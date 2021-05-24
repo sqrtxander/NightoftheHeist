@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5be02ee5-ef08-46d9-866a-c0bcf8cb62d7" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,30 +64,50 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="WindowStateProjectService">
-    <state width="1259" height="161" key="GridCell.Tab.0.bottom" timestamp="1621665500624">
+    <state width="1259" height="130" key="GridCell.Tab.0.bottom" timestamp="1621840756705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="161" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621665500624" />
-    <state width="1259" height="161" key="GridCell.Tab.0.center" timestamp="1621665500624">
+    <state width="1259" height="130" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
+    <state width="1259" height="130" key="GridCell.Tab.0.center" timestamp="1621840756705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="161" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1621665500624" />
-    <state width="1259" height="161" key="GridCell.Tab.0.left" timestamp="1621665500624">
+    <state width="1259" height="130" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
+    <state width="1259" height="130" key="GridCell.Tab.0.left" timestamp="1621840756705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="161" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1621665500624" />
-    <state width="1259" height="161" key="GridCell.Tab.0.right" timestamp="1621665500624">
+    <state width="1259" height="130" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
+    <state width="1259" height="130" key="GridCell.Tab.0.right" timestamp="1621840756705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="161" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1621665500624" />
-    <state x="251" y="30" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1621484428491">
+    <state width="1259" height="130" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
+    <state width="1259" height="215" key="GridCell.Tab.1.bottom" timestamp="1621840222610">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="251" y="30" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1280.680@0.0.1280.680" timestamp="1621484428491" />
-    <state x="297" y="151" key="run.anything.popup" timestamp="1621664909458">
+    <state width="1259" height="215" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
+    <state width="1259" height="215" key="GridCell.Tab.1.center" timestamp="1621840222610">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="297" y="151" key="run.anything.popup/0.0.1280.680@0.0.1280.680" timestamp="1621664909458" />
+    <state width="1259" height="215" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
+    <state width="1259" height="215" key="GridCell.Tab.1.left" timestamp="1621840222610">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="215" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
+    <state width="1259" height="215" key="GridCell.Tab.1.right" timestamp="1621840222610">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="215" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
   </component>
 </project>
