@@ -77,37 +77,32 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1259" height="130" key="GridCell.Tab.0.bottom" timestamp="1621840756705">
+    <state width="1259" height="215" key="GridCell.Tab.0.bottom" timestamp="1621914090462">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="130" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
-    <state width="1259" height="130" key="GridCell.Tab.0.center" timestamp="1621840756705">
+    <state width="1259" height="215" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621914090462" />
+    <state width="1259" height="215" key="GridCell.Tab.0.center" timestamp="1621914090462">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="130" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
-    <state width="1259" height="130" key="GridCell.Tab.0.left" timestamp="1621840756705">
+    <state width="1259" height="215" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1621914090462" />
+    <state width="1259" height="215" key="GridCell.Tab.0.left" timestamp="1621914090462">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="130" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
-    <state width="1259" height="130" key="GridCell.Tab.0.right" timestamp="1621840756705">
+    <state width="1259" height="215" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1621914090462" />
+    <state width="1259" height="215" key="GridCell.Tab.0.right" timestamp="1621914090462">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="130" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1621840756705" />
-    <state width="1259" height="215" key="GridCell.Tab.1.bottom" timestamp="1621840222610">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1259" height="215" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
-    <state width="1259" height="215" key="GridCell.Tab.1.center" timestamp="1621840222610">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1259" height="215" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
-    <state width="1259" height="215" key="GridCell.Tab.1.left" timestamp="1621840222610">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1259" height="215" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
-    <state width="1259" height="215" key="GridCell.Tab.1.right" timestamp="1621840222610">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1259" height="215" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1621840222610" />
+    <state width="1259" height="215" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1621914090462" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>32</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
