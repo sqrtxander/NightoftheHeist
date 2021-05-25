@@ -9,12 +9,21 @@ class Game:
         self.obj = None
         self.response = None
         self.inventory = []
-        self.actions = ('help', 'inventory', 'walk', 'grab', 'drop', 'use')
+        self.actions = ('help', 'inventory', 'actions', 'walk', 'grab', 'drop', 'use')
         self.objects = [['rock', 'key'],  # level 0 objects
                         ['bag', 'soap']]  # level 1 objects
         self.plx, self.ply = 0, 0  # player's x and y coordinates
-        self.level = 0
-        self.max_level = 0
+        self.lvl = 0
+        self.max_lvl = 0
+
+    def describe_area(self):
+        general_desc = ['You are outside of the bank'  # level 0 description
+                        ]
+
+        pathways = {(0, 0): 'right', (1, 0): 'left and up'  # level 0 pathways
+                    }
+
+        text = general_desc[self.lvl]
 
     def help_(self):
         # TODO
@@ -77,27 +86,27 @@ class Game:
         else:
             dx, dy = dirs[self.obj]
             if (self.plx + dx, self.ply + dy) in map_spaces:  # if space is on the map
-                if map_spaces[(self.plx + dx, self.ply + dy)] <= self.max_level:  # if level of space is unlocked
+                if map_spaces[(self.plx + dx, self.ply + dy)] <= self.max_lvl:  # if level of space is unlocked
                     self.plx += dx
                     self.ply += dy
                     print(f'You walked {self.obj}')
                     print((self.plx, self.ply))
 
-                    self.level = map_spaces[(self.plx, self.ply)]
+                    self.lvl = map_spaces[(self.plx, self.ply)]
 
-                    print(self.level)  # update level you are in
+                    print(self.lvl)  # update level you are in
                 else:
-                    print('You do not have the ability to go here yet.')
+                    print('You have not unlocked this area yet')
             else:
-                print('You walked into a wall.')
+                print('You walked into a wall')
 
     def grab(self):  # grab action moves object from the areas object list to players inventory
         if self.obj is None:
             print('This action is used in the form "grab <object>"')
-        if self.obj in self.objects[self.level]:  # if the object is in the room
-            self.objects[self.level].remove(self.obj)
+        if self.obj in self.objects[self.lvl]:  # if the object is in the room
+            self.objects[self.lvl].remove(self.obj)
             self.inventory.append(self.obj)
-            print(f'You picked up {self.obj}.')
+            print(f'You picked up {self.obj}')
         else:  # if the object isn't there to grab.
             print(f'There isn\'t "{self.obj}" in the area')
 
@@ -105,7 +114,7 @@ class Game:
         if self.obj is None:
             print('This action is used in the form "drop <object>"')
         if self.obj in self.inventory:  # if the object is in your inventory
-            self.objects[self.level].append(self.obj)
+            self.objects[self.lvl].append(self.obj)
             self.inventory.remove(self.obj)
             print(f'You dropped {self.obj}')
         else:
@@ -120,13 +129,11 @@ class Game:
             print('There are no items in your inventory.')
         else:
             print('The items currently in your inventory are:')
-            for i in self.inventory:
-                print(i)
+            print(', '.join(self.inventory))
 
     def print_actions(self):
         print('The recognised actions are:')
-        for i in self.actions:
-            print(i)
+        print(', '.join(self.actions))
 
     def parse_inp(self):  # TODO
 
