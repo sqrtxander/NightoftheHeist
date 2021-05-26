@@ -9,21 +9,37 @@ class Game:
         self.obj = None
         self.response = None
         self.inventory = []
-        self.actions = ('help', 'inventory', 'actions', 'walk', 'grab', 'drop', 'use')
-        self.objects = [['rock', 'key'],  # level 0 objects
-                        ['bag', 'soap']]  # level 1 objects
+        self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use')
+        # self.objects = [['rock', 'key', 'poo', '4', '5'],  # level 0 objects
+        #                 ['bag', 'soap']]  # level 1 objects
+
+        self.objects = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key']  # level 0 objects
+                        }
         self.plx, self.ply = 0, 0  # player's x and y coordinates
         self.lvl = 0
         self.max_lvl = 0
 
     def describe_area(self):
-        general_desc = ['You are outside of the bank'  # level 0 description
-                        ]
+        general_desc = {(0, 0): 'You are outside of the bank, you see the entrance above and to the right of you',
+                        (1,
+                         0): 'You are outside of the bank, there is an area to your left. The entrance is locked and above you'
+                        # level 0 descriptions
+                        }
 
-        pathways = {(0, 0): 'right', (1, 0): 'left and up'  # level 0 pathways
-                    }
+        # objects_list = ', '.join(self.objects[self.lvl][:-1]) + ' and ' + self.objects[self.lvl][-1]
 
-        text = general_desc[self.lvl]
+        # takes list and puts it in the form 'a 0, a 1, a 2 and a 3'
+        objs_list = ['a ' + i for i in self.objects[(self.plx, self.ply)]]
+        if len(objs_list) == 1:
+            objects_str = objs_list[0]
+        elif len(objs_list) == 0:
+            objects_str = 'nothing'
+
+        else:
+            objects_str = ', '.join(objs_list[:-1]) + ' and ' + objs_list[-1]
+
+        text = general_desc[(self.plx, self.ply)] + ', you see ' + objects_str
+        print(text)
 
     def help_(self):
         # TODO
@@ -38,14 +54,14 @@ class Game:
             sleep(1)
             print('>')
             sleep(1)
-            print('You are being prompted to input something')
+            print('You are being prompted to type something')
             sleep(1)
-            print('For the list of actions, input "actions"')
+            print('For the list of actions you can do, type "actions"')
             sleep(1)
             print()
 
         elif self.obj not in self.actions:
-            print(f'Action {self.obj} not recognised')
+            print(f'Action "{self.obj}" not recognised')
 
         elif self.obj == 'walk':
             print('The walk action takes the form of "walk <direction>"')
@@ -55,7 +71,7 @@ class Game:
         elif self.obj == 'grab':
             print('The grab action takes the form of "grab <object>"')
             sleep(1)
-            print('The objects that are around you will be told to you') # TODO
+            print('The objects that are around you will be told to you')  # TODO
 
         elif self.obj == 'inventory':
             print('The inventory action takes the form of "inventory"')
@@ -66,6 +82,23 @@ class Game:
             print('The drop action takes the form of "drop <object>"')
             sleep(1)
             print('It will drop an item from your inventory into the current area')
+
+        elif self.obj == 'scan':
+            print('The scan action takes the form of "scan"')
+            sleep(1)
+            print('It will inform you of your surroundings and tell you what objects are around.')
+
+        elif self.obj == 'use':
+            print('The use function takes the form of "use <item>"')
+            sleep(1)
+            # TODO
+
+        elif self.obj == 'help':
+            print('The help function takes the form of "help <action>"')
+            sleep(1)
+            print('If there is no action provided, it will tell you the general help')
+            sleep(1)
+            print('It will tell you how the action is used and what it does')
 
     def walk(self):
         if self.obj is None:
@@ -81,7 +114,7 @@ class Game:
                 'down': (0, -1), 'left': (-1, 0)}
 
         if self.obj not in dirs:
-            print(f'Unknown direction {self.obj}')
+            print(f'Direction "{self.obj}" isn\'t recognised')
 
         else:
             dx, dy = dirs[self.obj]
@@ -89,12 +122,11 @@ class Game:
                 if map_spaces[(self.plx + dx, self.ply + dy)] <= self.max_lvl:  # if level of space is unlocked
                     self.plx += dx
                     self.ply += dy
-                    print(f'You walked {self.obj}')
-                    print((self.plx, self.ply))
+                    # print(f'You walked {self.obj}')
 
-                    self.lvl = map_spaces[(self.plx, self.ply)]
+                    self.lvl = map_spaces[(self.plx, self.ply)]  # update level you are in
 
-                    print(self.lvl)  # update level you are in
+                    self.describe_area()
                 else:
                     print('You have not unlocked this area yet')
             else:
@@ -103,10 +135,10 @@ class Game:
     def grab(self):  # grab action moves object from the areas object list to players inventory
         if self.obj is None:
             print('This action is used in the form "grab <object>"')
-        if self.obj in self.objects[self.lvl]:  # if the object is in the room
-            self.objects[self.lvl].remove(self.obj)
+        if self.obj in self.objects[(self.plx, self.ply)]:  # if the object is in the room
+            self.objects[(self.plx, self.ply)].remove(self.obj)
             self.inventory.append(self.obj)
-            print(f'You picked up {self.obj}')
+            print(f'You picked up the {self.obj}')
         else:  # if the object isn't there to grab.
             print(f'There isn\'t "{self.obj}" in the area')
 
@@ -114,9 +146,9 @@ class Game:
         if self.obj is None:
             print('This action is used in the form "drop <object>"')
         if self.obj in self.inventory:  # if the object is in your inventory
-            self.objects[self.lvl].append(self.obj)
+            self.objects[(self.plx, self.ply)].append(self.obj)
             self.inventory.remove(self.obj)
-            print(f'You dropped {self.obj}')
+            print(f'You dropped the {self.obj}')
         else:
             print(f'There isn\'t "{self.obj}" in your inventory')
 
@@ -148,7 +180,7 @@ class Game:
             self.obj = None
 
         if self.action not in self.actions:
-            print(f'Action {self.action} not recognised')
+            print(f'Action "{self.action}" not recognised')
 
         if self.action == 'help':
             self.help_()
@@ -159,6 +191,9 @@ class Game:
         elif self.action == 'actions':
             self.print_actions()
 
+        elif self.action == 'scan':
+            self.describe_area()
+
         elif self.action == 'drop':
             self.drop()
 
@@ -168,22 +203,22 @@ class Game:
         elif self.action == 'grab':
             self.grab()
 
-
     def main(self):
-#         print('Welcome to Night of the Heist.')
-#         sleep(1.5)
-#         print('When you see the following line:')
-#         sleep(1.5)
-#         print('>')
-#         sleep(1.5)
-#         print('you are being prompted to input something.')
-#         sleep(1.5)
-#         print('''If at any point during the game you don't know what you are doing,
-# you can simply input the phrase "help" when you are able to.''')
-#         sleep(3)
-#         print('''if you would like help now, enter the phrase "help",
-# otherwise, if you know what you're doing, press enter.''')
+    #     print('Welcome to Night of the Heist.')
+    #     sleep(1.5)
+    #     print('When you see the following line:')
+    #     sleep(1.5)
+    #     print('>')
+    #     sleep(1.5)
+    #     print('you are being prompted to input something.')
+    #     sleep(1.5)
+    #     print('''If at any point during the game you don't know what you are doing,
+    # you can simply input the phrase "help" when you are able to.''')
+    #     sleep(3)
+    #     print('''if you would like help now, enter the phrase "help",
+    # otherwise, if you know what you're doing, press enter.''')
 
+        self.describe_area()
         while True:
             self.response = input('>')
             self.parse_inp()
