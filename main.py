@@ -5,9 +5,9 @@ from time import sleep
 class Game:
 
     def __init__(self):
+        self.response = None
         self.action = None
         self.item = None
-        self.response = None
         self.inventory = []
         self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use')
         self.items = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key'],  # level 0 items
@@ -35,13 +35,11 @@ class Game:
         else:
             items_str = ', '.join(items_list[:-1]) + ' and ' + items_list[-1]
 
-        text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
-        print(text)
+        desc_text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
+        print(desc_text)
 
     def help_(self):
-        # TODO
-
-        if self.item is None:
+        if self.item is None:  # if self.item not provided i.e. user only typed "help"
             print('This is the general help')
             sleep(1)
             print('for action specific help, use this function in the form "help <action>"')
