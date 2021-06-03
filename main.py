@@ -16,14 +16,19 @@ class Game:
                       (2, 3): [], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
         self.plx, self.ply = 0, 0  # player's x and y coordinates
-        self.lvl = 0
+        # self.lvl = 0
         self.max_lvl = 0
 
     def describe_area(self):
         general_desc = {(0, 0): '''South west of bank''',
-                        (1, 0): 'South of bank. The door is firmly locked'
+                        (1, 0): 'South of bank. The door is firmly locked',
                         # level 0 descriptions
-                        }
+                        (1, 1): '', (1, 2): '', (1, 3): '',
+                        # level 1 descriptions
+                        (0, 2): '',
+                        # level 2 descriptions
+                        (2, 3): '', (3, 3): '',  # level 3 descriptions
+                        (3, 2): ''}  # level 4 descriptions
 
         # takes list and puts it in the form 'a 0, a 1, a 2 and a 3'
         items_list = ['a ' + i for i in self.items[(self.plx, self.ply)]]  # starts each item with the string 'a '
@@ -67,15 +72,15 @@ class Game:
             sleep(1)
             print('The items that are around you will be told to you')  # TODO
 
-        elif self.item == 'inventory':
-            print('The inventory action takes the form of "inventory"')
-            sleep(1)
-            print('It will tell you what you have in your inventory')
-
         elif self.item == 'drop':
             print('The drop action takes the form of "drop <item>"')
             sleep(1)
             print('It will drop an item from your inventory into the current area')
+
+        elif self.item == 'inventory':
+            print('The inventory action takes the form of "inventory"')
+            sleep(1)
+            print('It will tell you what you have in your inventory')
 
         elif self.item == 'scan':
             print('The scan action takes the form of "scan"')
@@ -95,9 +100,6 @@ class Game:
             print('It will tell you how the action is used and what it does')
 
     def walk(self):
-        if self.item is None:
-            print('This action is used in the form "walk <direction>"')
-
         map_spaces = {(0, 0): 0, (1, 0): 0,
                       (1, 1): 1, (1, 2): 1, (1, 3): 1,
                       (0, 2): 2,
@@ -106,7 +108,10 @@ class Game:
 
         dirs = {'north': (0, 1), 'east': (1, 0), 'south': (0, -1), 'west': (-1, 0)}
 
-        if self.item not in dirs:
+        if self.item is None:
+            print('This action is used in the form "walk <direction>"')
+
+        elif self.item not in dirs:
             print(f'Direction "{self.item}" isn\'t recognised')
 
         else:
@@ -116,7 +121,7 @@ class Game:
                     self.plx += dx
                     self.ply += dy
 
-                    self.lvl = map_spaces[(self.plx, self.ply)]  # update level you are in
+                    # self.lvl = map_spaces[(self.plx, self.ply)]  # update level you are in
 
                     self.describe_area()
                 else:
@@ -127,7 +132,7 @@ class Game:
     def grab(self):  # grab action moves item from the areas item list to players inventory
         if self.item is None:
             print('This action is used in the form "grab <item>"')
-        if self.item in self.items[(self.plx, self.ply)]:  # if the item is in the room
+        elif self.item in self.items[(self.plx, self.ply)]:  # if the item is in the room
             self.items[(self.plx, self.ply)].remove(self.item)
             self.inventory.append(self.item)
             print(f'You picked up the {self.item}')
@@ -137,7 +142,7 @@ class Game:
     def drop(self):  # drop action moves item from your inventory to the areas item list
         if self.item is None:
             print('This action is used in the form "drop <item>"')
-        if self.item in self.inventory:  # if the item is in your inventory
+        elif self.item in self.inventory:  # if the item is in your inventory
             self.items[(self.plx, self.ply)].append(self.item)
             self.inventory.remove(self.item)
             print(f'You dropped the {self.item}')
@@ -146,7 +151,19 @@ class Game:
 
     def use(self):
         # TODO
-        pass
+        if self.item not in self.inventory:
+            print(f'You do not have a {self.item} to use')
+            return
+
+        obj = input(f'What would you like to use the {self.item} on?\n').strip().lower()
+
+        if self.max_lvl == 0:
+            if self.item == 'wire':
+                if 'lock' in obj:
+                    print('You manage to pick the lock. The door creaks open.')
+                    self.max_lvl += 1
+                else:
+                    print(f'You can\'t use the {self.item} here')
 
     def print_inventory(self):
         if not self.inventory:  # if inventory is empty
@@ -160,7 +177,6 @@ class Game:
         print(', '.join(self.actions))
 
     def parse_inp(self):  # TODO
-
         response_list = self.response.lower().strip().split(' ')  # get a list of the words in the input
 
         try:
@@ -195,6 +211,9 @@ class Game:
         elif self.action == 'grab':
             self.grab()
 
+        elif self.action == 'use':
+            self.use()
+
     def main(self):
         #     print('Welcome to Night of the Heist.')
         #     sleep(1.5)
@@ -212,7 +231,7 @@ class Game:
 
         self.describe_area()
         while True:
-            self.response = input('>')
+            self.response = input('> ')
             self.parse_inp()
 
 
