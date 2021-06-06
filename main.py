@@ -23,7 +23,7 @@ class Game:
         general_desc = {(0, 0): '''South west of bank''',
                         (1, 0): 'South of bank. The door is firmly locked',
                         # level 0 descriptions
-                        (1, 1): '', (1, 2): '', (1, 3): '',
+                        (1, 1): 'Entrance of bank', (1, 2): '', (1, 3): '',
                         # level 1 descriptions
                         (0, 2): '',
                         # level 2 descriptions
@@ -49,15 +49,13 @@ class Game:
             sleep(1)
             print('for action specific help, use this function in the form "help <action>"')
             sleep(1)
+            print('For the list of actions you can do, type "actions"')
+            sleep(1)
             print('When you see the following line:')
             sleep(1)
             print('>')
             sleep(1)
             print('You are being prompted to type something')
-            sleep(1)
-            print('For the list of actions you can do, type "actions"')
-            sleep(1)
-            print()
 
         elif self.item not in self.actions:
             print(f'Action "{self.item}" not recognised')
@@ -70,7 +68,7 @@ class Game:
         elif self.item == 'grab':
             print('The grab action takes the form of "grab <item>"')
             sleep(1)
-            print('The items that are around you will be told to you')  # TODO
+            print('The items that are around you are told to you after walking or alternatively you can use the "scan" action')
 
         elif self.item == 'drop':
             print('The drop action takes the form of "drop <item>"')
@@ -106,7 +104,8 @@ class Game:
                       (2, 3): 3, (3, 3): 3,
                       (3, 2): 4}
 
-        dirs = {'north': (0, 1), 'east': (1, 0), 'south': (0, -1), 'west': (-1, 0)}
+        dirs = {'north': (0, 1), 'east': (1, 0), 'south': (0, -1), 'west': (-1, 0),
+                'up': (0, 1), 'right': (1, 0), 'down': (0, -1), 'left': (-1, 0)}
 
         if self.item is None:
             print('This action is used in the form "walk <direction>"')
