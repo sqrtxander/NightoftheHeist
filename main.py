@@ -3,6 +3,21 @@ import random
 from time import sleep
 
 
+def slow_print(text, delay):
+    for char in text:
+        print(char, end='')
+        sleep(delay)
+    print()
+
+
+def replay():
+    again = input('Would you like to play again? (y/n)\n')
+    if again.strip().lower() in ['y', 'yes']:
+        return True
+    else:
+        print('Thanks for playing Night of the Heist')
+        return False
+
 class Game:
 
     def __init__(self):  # declaring all the variables
@@ -14,7 +29,7 @@ class Game:
         self.items = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key'],  # level 0 items
                       (1, 1): [], (1, 2): [], (1, 3): [],  # level 1 items
                       (0, 2): [],  # level 2 items
-                      (2, 3): [], (3, 3): [],  # level 3 items
+                      (2, 3): ['paper'], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
         self.plx, self.ply = 0, 0  # player's x and y coordinates
         self.unlocked_lvls = [True, False, False, False, False]
@@ -23,14 +38,15 @@ class Game:
 
         print(self.vault_code)
 
-        self.wrong_till_over = 5
+        self.wrong_till_over = 10
+        # self.wrong_till_over = 0
 
     def describe_area(self):
         general_desc = {(0, 0): '''South west of bank''',
                         (1, 0): 'South of bank. The door is firmly locked',
                         # level 0 descriptions
                         (1, 1): 'Entrance of bank', (1, 2): 'Entrance of bank, the counter is on your left',
-                        (1, 3): 'Entrance of bank, there is a hallway above and to the right of you',
+                        (1, 3): 'Entrance of bank, there is a hallway to the right of you',
                         # level 1 descriptions
                         (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system',
                         # level 2 descriptions
@@ -171,6 +187,15 @@ class Game:
                         self.unlocked_lvls[3] = True
                     else:
                         print('You have already unlocked the door')
+                if 'door' in obj:
+                    print('These scratches will sure leave a mark.')
+            elif self.item == 'crowbar':
+                if any(x in obj for x in ('door', 'lock')):  # if obj contains door or lock
+                    print('The door doesn\'t open, these marks will sure attract the authorities')
+                    self.wrong_till_over -= 1
+
+
+
                 else:
                     print(f'You can\'t use the {self.item} here')
 
@@ -231,6 +256,9 @@ class Game:
         elif self.action == 'use':
             self.use()
 
+        elif self.action == 'die':
+            self.wrong_till_over = 0  #TODO delete this action
+
         else:
             self.other_inps()
 
@@ -245,9 +273,12 @@ class Game:
                     self.describe_area()
                 else:
                     print('Incorrect code, security called')
-                    self.wrong_till_over -= 1
+                    self.wrong_till_over -= 5
+        if 'paper' in self.inventory:
+            if 'read' in self.response:
+                print(f'You unfold the paper and see the numbers {self.vault_code}')
 
-        elif self.action not in self.actions:
+        if self.action not in self.actions:
             print(f'Action "{self.action}" not recognised')
 
     def main(self):
@@ -267,10 +298,29 @@ class Game:
 
         self.describe_area()
         while True:
+            if self.wrong_till_over <= 0:
+                sleep(1)
+                print('The door slams open')
+                sleep(1)
+                print('You hear someone scream at you to get on the ground')
+                sleep(1)
+                print('The authorities have caught you')
+                sleep(1)
+                slow_print('GAME OVER', 0.75)
+                break
             self.response = input('> ')
             self.parse_inp()
 
 
 if __name__ == '__main__':
-    game = Game()
-    game.main()
+
+    while True:
+        game = Game()
+        game.main()
+
+        print('================================================================')
+        if not replay():
+            break
+        print('================================================================')
+        sleep(2)
+
