@@ -1,10 +1,11 @@
 # imports
+import random
 from time import sleep
 
 
 class Game:
 
-    def __init__(self):
+    def __init__(self):  # declaring all the variables
         self.response = None
         self.action = None
         self.item = None
@@ -16,16 +17,22 @@ class Game:
                       (2, 3): [], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
         self.plx, self.ply = 0, 0  # player's x and y coordinates
-        # self.lvl = 0
-        self.max_lvl = 0
+        self.unlocked_lvls = [True, False, False, False, False]
+
+        self.vault_code = str(random.randint(0000, 9999)).zfill(4)  # generates a 4 digit code from 0000 to 9999
+
+        print(self.vault_code)
+
+        self.wrong_till_over = 5
 
     def describe_area(self):
         general_desc = {(0, 0): '''South west of bank''',
                         (1, 0): 'South of bank. The door is firmly locked',
                         # level 0 descriptions
-                        (1, 1): 'Entrance of bank', (1, 2): '', (1, 3): '',
+                        (1, 1): 'Entrance of bank', (1, 2): 'Entrance of bank, the counter is on your left',
+                        (1, 3): 'Entrance of bank, there is a hallway above and to the right of you',
                         # level 1 descriptions
-                        (0, 2): '',
+                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system',
                         # level 2 descriptions
                         (2, 3): '', (3, 3): '',  # level 3 descriptions
                         (3, 2): ''}  # level 4 descriptions
@@ -68,7 +75,8 @@ class Game:
         elif self.item == 'grab':
             print('The grab action takes the form of "grab <item>"')
             sleep(1)
-            print('The items that are around you are told to you after walking or alternatively you can use the "scan" action')
+            print('The items that are around you are told to you after walking or alternatively you can use the '
+                  '"scan" action')
 
         elif self.item == 'drop':
             print('The drop action takes the form of "drop <item>"')
@@ -116,11 +124,9 @@ class Game:
         else:
             dx, dy = dirs[self.item]
             if (self.plx + dx, self.ply + dy) in map_spaces:  # if space is on the map
-                if map_spaces[(self.plx + dx, self.ply + dy)] <= self.max_lvl:  # if level of space is unlocked
+                if self.unlocked_lvls[map_spaces[(self.plx + dx, self.ply + dy)]]:  # if level of space is unlocked
                     self.plx += dx
                     self.ply += dy
-
-                    # self.lvl = map_spaces[(self.plx, self.ply)]  # update level you are in
 
                     self.describe_area()
                 else:
@@ -156,13 +162,29 @@ class Game:
 
         obj = input(f'What would you like to use the {self.item} on?\n').strip().lower()
 
-        if self.max_lvl == 0:
+        if (self.plx, self.ply) == (1, 0):
             if self.item == 'wire':
                 if 'lock' in obj:
-                    print('You manage to pick the lock. The door creaks open.')
-                    self.max_lvl += 1
+                    if not self.unlocked_lvls[1]:  # if level 1 not unlocked
+                        print('You manage to pick the lock. The door creaks open.')
+                        self.unlocked_lvls[1] = True
+                        self.unlocked_lvls[3] = True
+                    else:
+                        print('You have already unlocked the door')
                 else:
                     print(f'You can\'t use the {self.item} here')
+
+        elif (self.plx, self.ply) == (1, 2):
+            if self.item == 'key':
+                if 'counter' in obj:
+                    print('The key worked, the counter is open')
+                    self.unlocked_lvls[2]\
+                        = True
+                else:
+                    print(f'You can\'t use {self.item} here')
+
+        else:
+            print(f'You can\'t use {self.item} here')
 
     def print_inventory(self):
         if not self.inventory:  # if inventory is empty
@@ -182,12 +204,8 @@ class Game:
             self.action = response_list[0]
             self.item = response_list[1]
         except IndexError:  # if there is less than 2 words in the input
-            # print(f'Unknown action {self.response}')
             self.action = response_list[0]
             self.item = None
-
-        if self.action not in self.actions:
-            print(f'Action "{self.action}" not recognised')
 
         if self.action == 'help':
             self.help_()
@@ -212,6 +230,25 @@ class Game:
 
         elif self.action == 'use':
             self.use()
+
+        else:
+            self.other_inps()
+
+    def other_inps(self):
+        if (self.plx, self.ply) == (0, 2):
+            if 'code' in self.response.lower():
+                code_guess = input('Enter code: ')
+                if code_guess == self.vault_code:
+                    self.unlocked_lvls[4] = True
+                    print('Vault unlocked')
+                elif 'cancel' in code_guess:
+                    self.describe_area()
+                else:
+                    print('Incorrect code, security called')
+                    self.wrong_till_over -= 1
+
+        elif self.action not in self.actions:
+            print(f'Action "{self.action}" not recognised')
 
     def main(self):
         #     print('Welcome to Night of the Heist.')
