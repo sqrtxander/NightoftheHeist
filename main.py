@@ -12,11 +12,16 @@ def slow_print(text, delay):
 
 def replay():
     again = input('Would you like to play again? (y/n)\n')
-    if again.strip().lower() in ['y', 'yes']:
+    if again.strip().lower() in ['y', 'yes']:  # if response is yes
         return True
-    else:
+    elif again.strip().lower() in ['n', 'no']:  # if response is no
         print('Thanks for playing Night of the Heist')
         return False
+    else:  # if response is unrecognised
+        print('Your response was not recognised')
+        sleep(1)
+        return replay()
+
 
 class Game:
 
@@ -28,7 +33,7 @@ class Game:
         self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use')
         self.items = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key'],  # level 0 items
                       (1, 1): [], (1, 2): [], (1, 3): [],  # level 1 items
-                      (0, 2): [],  # level 2 items
+                      (0, 2): ['backpack'],  # level 2 items
                       (2, 3): ['paper'], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
         self.plx, self.ply = 0, 0  # player's x and y coordinates
@@ -38,14 +43,15 @@ class Game:
 
         print(self.vault_code)
 
-        self.wrong_till_over = 10
+        self.turns_till_over = 50
         # self.wrong_till_over = 0
 
-    def describe_area(self):
+    def describe_area(self):  # describe area function prints the description of what is around you and what you see
         general_desc = {(0, 0): '''South west of bank''',
                         (1, 0): 'South of bank. The door is firmly locked',
                         # level 0 descriptions
-                        (1, 1): 'Entrance of bank', (1, 2): 'Entrance of bank, the counter is on your left',
+                        (1, 1): 'Entrance of bank, there is a pathway above you, the door is below you',
+                        (1, 2): 'Entrance of bank, the counter is on your left',
                         (1, 3): 'Entrance of bank, there is a hallway to the right of you',
                         # level 1 descriptions
                         (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system',
@@ -66,7 +72,7 @@ class Game:
         desc_text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
         print(desc_text)
 
-    def help_(self):
+    def help_(self):  # help function tells the user ho weach action works
         if self.item is None:  # if self.item not provided i.e. user only typed "help"
             print('This is the general help')
             sleep(1)
@@ -150,60 +156,76 @@ class Game:
             else:
                 print('You walked into a wall')
 
-    def grab(self):  # grab action moves item from the areas item list to players inventory
-        if self.item is None:
+    def grab(self):  # grab action moves item from the area's item list to player's inventory capping at 5 items in
+        # the player's inventory and 10 if they are holding a backpack
+
+        if self.item is None:  # if the item to grab is not provided
             print('This action is used in the form "grab <item>"')
+
+        elif len(self.inventory) >= 5 and 'backpack' not in self.inventory:  # if your hands are full
+            print('You are holding too many things at once')
+        elif len(self.inventory) >= 10 and 'backpack' in self.inventory:  # if your hands and bag are full
+            print('You are holding too many things at once')
+
         elif self.item in self.items[(self.plx, self.ply)]:  # if the item is in the room
-            self.items[(self.plx, self.ply)].remove(self.item)
-            self.inventory.append(self.item)
+            self.items[(self.plx, self.ply)].remove(self.item)  # removes the item from the area's item list
+            self.inventory.append(self.item)  # adds the item to the player's inventory
             print(f'You picked up the {self.item}')
+
         else:  # if the item isn't there to grab.
             print(f'There isn\'t "{self.item}" in the area')
 
-    def drop(self):  # drop action moves item from your inventory to the areas item list
-        if self.item is None:
+    def drop(self):  # drop action moves item from player's inventory to the area's item list
+
+        if self.item is None:  # if the item to drop is not provided
             print('This action is used in the form "drop <item>"')
+
         elif self.item in self.inventory:  # if the item is in your inventory
-            self.items[(self.plx, self.ply)].append(self.item)
-            self.inventory.remove(self.item)
+            self.items[(self.plx, self.ply)].append(self.item)  # adds the item to  the area's item list
+            self.inventory.remove(self.item)  # removes the item from the player's inventory
             print(f'You dropped the {self.item}')
+
         else:
             print(f'There isn\'t "{self.item}" in your inventory')
 
-    def use(self):
+    def use(self):  # use function completes actions that are required for the game to progress
         # TODO
-        if self.item not in self.inventory:
+        if self.item not in self.inventory:  # if player does not have th eitem in their inventory
             print(f'You do not have a {self.item} to use')
-            return
+            return  # stops the rest of the function from executing
 
         obj = input(f'What would you like to use the {self.item} on?\n').strip().lower()
 
         if (self.plx, self.ply) == (1, 0):
+            
+
+
             if self.item == 'wire':
-                if 'lock' in obj:
+                if any(x in obj for x in ('door', 'lock')):  # if obj contains door or lock
                     if not self.unlocked_lvls[1]:  # if level 1 not unlocked
                         print('You manage to pick the lock. The door creaks open.')
                         self.unlocked_lvls[1] = True
                         self.unlocked_lvls[3] = True
                     else:
                         print('You have already unlocked the door')
-                if 'door' in obj:
-                    print('These scratches will sure leave a mark.')
+
             elif self.item == 'crowbar':
                 if any(x in obj for x in ('door', 'lock')):  # if obj contains door or lock
                     print('The door doesn\'t open, these marks will sure attract the authorities')
-                    self.wrong_till_over -= 1
-
-
-
+                    self.turns_till_over -= 2
                 else:
                     print(f'You can\'t use the {self.item} here')
+            elif self.item == 'key':
+                if any(x in obj for x in ('door', 'lock')):  # if obj contains door or lock
+                    print('The key doesn\'t fit the lock')
+            else:
+                print(f'You can\'t use {self.item} here')
 
         elif (self.plx, self.ply) == (1, 2):
             if self.item == 'key':
                 if 'counter' in obj:
                     print('The key worked, the counter is open')
-                    self.unlocked_lvls[2]\
+                    self.unlocked_lvls[2] \
                         = True
                 else:
                     print(f'You can\'t use {self.item} here')
@@ -211,14 +233,15 @@ class Game:
         else:
             print(f'You can\'t use {self.item} here')
 
-    def print_inventory(self):
+
+    def print_inventory(self):  # prints the player's inventory separated by commas
         if not self.inventory:  # if inventory is empty
             print('There are no items in your inventory.')
         else:
             print('The items currently in your inventory are:')
             print(', '.join(self.inventory))
 
-    def print_actions(self):
+    def print_actions(self):  # prints the list of actions separated by commas
         print('The recognised actions are:')
         print(', '.join(self.actions))
 
@@ -257,13 +280,13 @@ class Game:
             self.use()
 
         elif self.action == 'die':
-            self.wrong_till_over = 0  #TODO delete this action
+            self.turns_till_over = 0  # TODO delete this action
 
         else:
             self.other_inps()
 
-    def other_inps(self):
-        if (self.plx, self.ply) == (0, 2):
+    def other_inps(self):  # edge cases for specific actions
+        if (self.plx, self.ply) == (0, 2):  # enter code action
             if 'code' in self.response.lower():
                 code_guess = input('Enter code: ')
                 if code_guess == self.vault_code:
@@ -273,12 +296,15 @@ class Game:
                     self.describe_area()
                 else:
                     print('Incorrect code, security called')
-                    self.wrong_till_over -= 5
-        if 'paper' in self.inventory:
+                    self.turns_till_over -= 5
+            return
+
+        if 'paper' in self.inventory:  # read paper action
             if 'read' in self.response:
                 print(f'You unfold the paper and see the numbers {self.vault_code}')
+            return
 
-        if self.action not in self.actions:
+        if self.action not in self.actions:  # unrecognised action
             print(f'Action "{self.action}" not recognised')
 
     def main(self):
@@ -298,8 +324,7 @@ class Game:
 
         self.describe_area()
         while True:
-            if self.wrong_till_over <= 0:
-                sleep(1)
+            if self.turns_till_over <= 0:
                 print('The door slams open')
                 sleep(1)
                 print('You hear someone scream at you to get on the ground')
@@ -310,6 +335,7 @@ class Game:
                 break
             self.response = input('> ')
             self.parse_inp()
+            self.turns_till_over -= 1
 
 
 if __name__ == '__main__':
@@ -319,8 +345,9 @@ if __name__ == '__main__':
         game.main()
 
         print('================================================================')
+        sleep(1)
         if not replay():
+            sleep(2)
             break
         print('================================================================')
         sleep(2)
-
