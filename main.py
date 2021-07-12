@@ -35,29 +35,36 @@ class Game:
                       (1, 1): [], (1, 2): [], (1, 3): ['cloth'],  # level 1 items
                       (0, 2): ['backpack'],  # level 2 items
                       (2, 3): ['paper'], (3, 3): [],  # level 3 items
-                      (3, 2): ['money', 'gold', 'diamonds']}  # level 4 items
+                      (3, 2): []}  # level 4 items
         self.plx, self.ply = 0, 0  # player's x and y coordinates
         self.unlocked_lvls = [True, False, False, False, False]
 
         self.vault_code = str(random.randint(0000, 9999)).zfill(4)  # generates a 4 digit code from 0000 to 9999
 
-        print(self.vault_code)
+        print(self.vault_code)  # TODO delete
 
         self.turns_till_over = 50
+
+        self.visited_vault = False
+
+        self.score = 0
         # self.wrong_till_over = 0
 
     def describe_area(self):  # describe area function prints the description of what is around you and what you see
         general_desc = {(0, 0): '''South west of bank''',
-                        (1, 0): 'South of bank. The door is firmly locked',
+                        (1, 0): 'South of bank, there is a door above you',
                         # level 0 descriptions
                         (1, 1): 'Entrance of bank, there is a pathway above you, the door is below you',
-                        (1, 2): 'Entrance of bank, the counter is on your left',
-                        (1, 3): 'Entrance of bank, there is a hallway to the right of you',
+                        (1, 2): 'Entrance of bank, the counter is on your left, there are walkways above and below you',
+                        (1, 3): 'Entrance of bank, there is a hallway to the right of you, there is a walkway below you',
                         # level 1 descriptions
-                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system',
+                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system, the entrance is to your right',
                         # level 2 descriptions
-                        (2, 3): '', (3, 3): '',  # level 3 descriptions
-                        (3, 2): ''}  # level 4 descriptions
+                        (2, 3): 'You are in a crowded hallway, the entrance is below you, there is an opening to your right',
+                        (3, 3): 'You are in a crowded hallway, you manage to make out a vault door below you, the hallway continues to the left',
+                        # level 3 descriptions
+                        (3, 2): 'You are in the vault, money is scattered everywhere, the door is above you'
+                        }  # level 4 descriptions
 
         # takes list and puts it in the form 'a 0, a 1, a 2 and a 3'
         items_list = ['a ' + i for i in self.items[(self.plx, self.ply)]]  # starts each item with the string 'a '
@@ -69,7 +76,11 @@ class Game:
         else:
             items_str = ', '.join(items_list[:-1]) + ' and ' + items_list[-1]
 
-        desc_text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
+        if (self.plx, self.ply) == (3, 2):  # if player is in the vault, we don't want to say you see nothing
+            desc_text = general_desc[(self.plx, self.ply)]
+        else:
+            desc_text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
+
         print(desc_text)
 
     def help_(self):  # help function tells the user how each action works
@@ -156,11 +167,23 @@ class Game:
             else:
                 print('You walked into a wall')
 
+        if (self.plx, self.ply) == (3, 2):  # if player is in the vault
+            self.visited_vault = True
+            self.unlocked_lvls[4] = False  # set the vault to locked for when you walk out
+            self.unlocked_lvls[0] = False
+
     def grab(self):  # grab action moves item from the area's item list to player's inventory capping at 5 items in
         # the player's inventory and 10 if they are holding a backpack
 
         if self.item is None:  # if the item to grab is not provided
             print('This action is used in the form "grab <item>"')
+
+        if (self.plx, self.ply) == (3, 2) and self.item == 'money':  # if player is in the vault and picking up money
+            if 'backpack' in self.inventory:
+                self.score = 150000*(10-len(self.inventory))
+                print(f'You now have ${150000*(10-len(self.inventory))}')
+            else:
+                print(f'You picked up ${150000*(5-len(self.inventory))}')
 
         elif len(self.inventory) >= 5 and 'backpack' not in self.inventory:  # if your hands are full
             print('You are holding too many things at once')
@@ -196,7 +219,7 @@ class Game:
 
         obj = input(f'What would you like to use the {self.item} on?\n').strip().lower()
 
-        if (self.plx, self.ply) == (1, 0):
+        if (self.plx, self.ply) == (1, 0):  # if standing beneath the door to the bank
             if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
                 if not self.unlocked_lvls[1]:  # if level 1 not unlocked
                     if self.item == 'wire':
@@ -214,18 +237,46 @@ class Game:
                     print('You have already unlocked the door')
 
         elif (self.plx, self.ply) == (1, 2):
-            if any(x in obj for x in ('counter', 'door', 'lock')):
-                if self.item == 'key':
-                    print('The key worked, the counter is open')
-                    self.unlocked_lvls[2] = True
-                elif self.item == 'crowbar':
-                    print('Maybe it\'s best not to make such a loud sound. The counter remains locked.')
-                    self.turns_till_over -= 2
+            if not self.visited_vault:
+                if any(x in obj for x in ('counter', 'door', 'lock')):
+                    if not self.unlocked_lvls[2]:
+                        if self.item == 'key':
+                            print('The key worked, the counter is open')
+                            self.unlocked_lvls[2] = True
+                        elif self.item == 'crowbar':
+                            print('Maybe it\'s best not to make such a loud sound. The counter remains locked.')
+                            self.turns_till_over -= 2
+                        else:
+                            print(f'You can\'t use {self.item} here')
+                    else:
+                        print('You have already unlocked this area')
                 else:
-                    print(f'You can\'t use {self.item} here')
+                    print(f'You can\'t use the {self.item} here')
+            if self.visited_vault:
+                if any(x in obj for x in ('counter', 'door', 'lock')):
+                    if self.item == 'cloth':
+                        print('You wipe your fingerprints off the counter')
+                        self.turns_till_over += 10
+
+        elif (self.plx, self.ply) == (1, 1):
+            if self.visited_vault:
+                if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
+                    if not self.unlocked_lvls[0]:  # if level 0 not unlocked
+                        if self.item == 'wire':
+                            print('You manage to pick the lock. The door creaks open.')
+                            self.unlocked_lvls[0] = True
+                        elif self.item == 'crowbar':
+                            print('The door doesn\'t open, these marks will sure attract the authorities')
+                            self.turns_till_over -= 2
+                        elif self.item == 'key':
+                            print('The key doesn\'t fit the lock')
+                        else:
+                            print(f'You can\'t use the {self.item} here')
+                    else:
+                        print('You have already unlocked the door')
 
         else:
-            print(f'You can\'t use {self.item} here')
+            print(f'You can\'t use the {self.item} here')
 
     def print_inventory(self):  # prints the player's inventory separated by commas
         if not self.inventory:  # if inventory is empty
@@ -281,18 +332,19 @@ class Game:
     def other_inps(self):  # edge cases for specific actions
         # enter code action
         # if at counter and want to enter code
-        if (self.plx, self.ply) == (0, 2) and  any(x in self.response.lower() for x in ('code', 'enter')):
-            code_guess = input('Enter code: ')
-            if code_guess == self.vault_code:
-                self.unlocked_lvls[4] = True
-                print('Vault unlocked')
-            elif 'cancel' in code_guess:
-                self.describe_area()
+        if (self.plx, self.ply) == (0, 2) and any(x in self.response.lower() for x in ('code', 'enter')):
+            if not(self.unlocked_lvls[4] or self.visited_vault):  # if you haven't unlocked the vault yet
+                code_guess = input('Enter code: ')
+                if code_guess == self.vault_code:
+                    self.unlocked_lvls[4] = True
+                    print('You hear a metal swinging sound in the distance, the words "Vault unlocked" appear on the screen')
+                elif 'cancel' in code_guess:
+                    self.describe_area()
+                else:
+                    print('Incorrect code, security called')
+                    self.turns_till_over -= 10
             else:
-                print('Incorrect code, security called')
-                self.turns_till_over -= 5
-            return
-
+                print('You have already unlocked the vault')
         elif 'paper' in self.inventory and 'read' in self.response:  # read paper action
             print(f'You unfold the paper and see the numbers {self.vault_code}')
 
