@@ -36,7 +36,7 @@ class Game:
                       (0, 2): ['backpack'],  # level 2 items
                       (2, 3): ['paper'], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
-        self.plx, self.ply = 0, 0  # player's x and y coordinates
+        self.plx, self.ply = 3, 2  # player's x and y coordinates
         self.unlocked_lvls = [True, False, False, False, False]
 
         self.vault_code = str(random.randint(0000, 9999)).zfill(4)  # generates a 4 digit code from 0000 to 9999
@@ -178,16 +178,22 @@ class Game:
         if self.item is None:  # if the item to grab is not provided
             print('This action is used in the form "grab <item>"')
 
-        if (self.plx, self.ply) == (3, 2) and self.item == 'money':  # if player is in the vault and picking up money
-            if 'backpack' in self.inventory:
-                self.score = 150000*(10-len(self.inventory))
-                print(f'You now have ${150000*(10-len(self.inventory))}')
-            else:
-                print(f'You picked up ${150000*(5-len(self.inventory))}')
+        if 'backpack' in self.inventory:
+            inv_spaces = 10 - len(self.inventory)
+        else:
+            inv_spaces = 5 - len(self.inventory)
 
-        elif len(self.inventory) >= 5 and 'backpack' not in self.inventory:  # if your hands are full
-            print('You are holding too many things at once')
-        elif len(self.inventory) >= 10 and 'backpack' in self.inventory:  # if your hands and bag are full
+
+        if (self.plx, self.ply) == (3, 2) and self.item == 'money':  # if player is in the vault and picking up money
+            # if 'backpack' in self.inventory:
+            #     self.score = 150000*(10-len(self.inventory))
+            #     print(f'You now have ${150000*(10-len(self.inventory))}')
+            # else:
+            #     print(f'You picked up ${150000*(5-len(self.inventory))}')
+
+            print(f'You picked up ${150000*inv_spaces}')
+
+        elif inv_spaces <= 0:  # if your hands are full
             print('You are holding too many things at once')
 
         elif self.item in self.items[(self.plx, self.ply)]:  # if the item is in the room
