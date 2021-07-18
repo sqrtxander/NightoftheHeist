@@ -40,14 +40,14 @@ class Game:
         self.response = None
         self.action = None
         self.item = None
-        self.inventory = []
-        self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use')
+        self.inventory = ['paper']
+        self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use', 'read', 'enter code')
         self.items = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key'],  # level 0 items
                       (1, 1): [], (1, 2): [], (1, 3): ['cloth'],  # level 1 items
                       (0, 2): ['backpack'],  # level 2 items
                       (2, 3): ['paper'], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
-        self.plx, self.ply = 0, 0  # player's x and y coordinates
+        self.plx, self.ply = 0, 2  # player's x and y coordinates
         self.unlocked_lvls = [True, False, False, False, False]
 
         self.vault_code = str(random.randint(0000, 9999)).zfill(4)  # generates a 4 digit code from 0000 to 9999
@@ -70,8 +70,8 @@ class Game:
                         (1, 3): 'Entrance of bank, there is a hallway to the right of you, '
                                 'there is a walkway below you',
                         # level 1 descriptions
-                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system, '
-                                'the entrance is to your right',
+                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system '
+                                '(use by typing "enter code"), the entrance is to your right',
                         # level 2 descriptions
                         (2, 3): 'You are in a crowded hallway, the entrance is below you, '
                                 'there is an opening to your right',
@@ -91,7 +91,8 @@ class Game:
         else:
             items_str = ', '.join(items_list[:-1]) + ' and ' + items_list[-1]
 
-        if (self.plx, self.ply) == (3, 2):  # if player is in the vault, we don't want to say you see nothing
+        # if player is in the vault without items around them, we don't want to say you see nothing
+        if (self.plx, self.ply) == (3, 2) and not self.items[(3, 2)]:
             desc_text = general_desc[(self.plx, self.ply)]
         else:
             desc_text = general_desc[(self.plx, self.ply)] + ', you see ' + items_str
@@ -142,12 +143,24 @@ class Game:
             print('It will inform you of your surroundings and tell you what items are around')
 
         elif self.item == 'use':
-            print('The use function takes the form of "use <item>"')
+            print('The use action takes the form of "use <item>"')
             sleep(1)
             print('It will ask you what you want to use the item on')
             sleep(1)
             print('It allows you to complete sections of the game performing necessary actions to unlock new areas')
             # TODO
+
+        elif self.item in ['enter' 'code']:
+            print('The enter code action takes the form of "enter code"')
+            sleep(1)
+            print('You are only able to use it when you are behind the counter')
+            sleep(1)
+            print('You will be asked to enter the code or to cancel')
+
+        elif self.item == 'read':
+            print('The read action takes the form of "read <item>"')
+            sleep(1)
+            print('If you have the item on you it will tell you what it says')
 
         elif self.item == 'help':
             print('The help function takes the form of "help <action>"')
@@ -189,14 +202,17 @@ class Game:
                 print('You walked into a wall')
 
         if (self.plx, self.ply) == (3, 2):  # if player is in the vault
+            if self.unlocked_lvls[0]:  # if the outside area is unlocked
+                print('You hear the sound of the entrance slamming shut')
+                self.unlocked_lvls[0] = False  # locks the outside area
             self.visited_vault = True
-            self.unlocked_lvls[0] = False  # locks the outside area
 
     def grab(self):  # grab action moves item from the area's item list to player's inventory capping at 5 items in
         # the player's inventory and 10 if they are holding a backpack
 
         if self.item is None:  # if the item to grab is not provided
             print('This action is used in the form "grab <item>"')
+            return
 
         if 'backpack' in self.inventory:
             inv_spaces = 10 - len(self.inventory) - self.score//150000
@@ -224,14 +240,15 @@ class Game:
             print('This action is used in the form "drop <item>"')
 
         elif self.item == 'money':
-            amount = get_num('How much money do you want to drop? (response will be rounded up)\n')
+            amount = get_num('How much money do you want to drop? '
+                             '(response will be rounded up to the nearest $150000)\n')
             amount = ceil(amount/150000) * 150000  # rounds amount up to the nearest 150000
             if self.score >= amount:
                 self.score -= amount
                 print(f'You dropped ${amount}')
                 sleep(1)
                 if (self.plx, self.ply) != (3, 2):
-                print('The money mysteriously disappears, go back to the vault to get more')
+                    print('The money mysteriously disappears, go back to the vault to get more')
             else:
                 print(f'You do not have ${amount} to drop')
 
@@ -244,17 +261,22 @@ class Game:
             print(f'There isn\'t "{self.item}" in your inventory')
 
     def use(self):  # use function completes actions that are required for the game to progress
+
+        if self.item is None:
+            print('This action is used in the form "use <item>"')
+            return  # stops the rest of the function from executing
+
         if self.item not in self.inventory:  # if player does not have the item in their inventory
-            print(f'You do not have a {self.item} to use')
+            print(f'You do not have a "{self.item}" to use')
             return  # stops the rest of the function from executing
 
         obj = input(f'What would you like to use the {self.item} on?\n').strip().lower()
 
-        if (self.plx, self.ply) == (1, 0):  # if standing beneath the door to the bank
+        if (self.plx, self.ply) == (1, 0) and not self.visited_vault:  # if standing beneath the door to the bank
             if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
                 if not self.unlocked_lvls[1]:  # if level 1 not unlocked
                     if self.item == 'wire':
-                        print('You manage to pick the lock. The door creaks open.')
+                        print('You manage to pick the lock. The door creaks open')
                         self.unlocked_lvls[1] = True
                         self.unlocked_lvls[3] = True
                     elif self.item == 'crowbar':
@@ -275,7 +297,7 @@ class Game:
                             print('The key worked, the counter is open')
                             self.unlocked_lvls[2] = True
                         elif self.item == 'crowbar':
-                            print('Maybe it\'s best not to make such a loud sound. The counter remains locked.')
+                            print('Maybe it\'s best not to make such a loud sound. The counter remains locked')
                             self.turns_till_over -= 2
                         else:
                             print(f'You can\'t use {self.item} here')
@@ -289,29 +311,58 @@ class Game:
                         print('You wipe your fingerprints off the counter')
                         self.turns_till_over += 10
 
-        elif (self.plx, self.ply) == (1, 1):
-            if self.visited_vault:
-                if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
-                    if not self.unlocked_lvls[0]:  # if level 0 not unlocked
-                        if self.item == 'wire':
-                            print('You manage to pick the lock. The door creaks open.')
-                            self.unlocked_lvls[0] = True
-                        elif self.item == 'crowbar':
-                            print('The door doesn\'t open, these marks will sure attract the authorities')
-                            self.turns_till_over -= 2
-                        elif self.item == 'key':
-                            print('The key doesn\'t fit the lock')
-                        else:
-                            print(f'You can\'t use the {self.item} here')
+        elif (self.plx, self.ply) == (1, 1) and self.visited_vault:
+            if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
+                if not self.unlocked_lvls[0]:  # if level 0 not unlocked
+                    if self.item == 'wire':
+                        print('You manage to pick the lock. The door creaks open')
+                        self.unlocked_lvls[0] = True
+                    elif self.item == 'crowbar':
+                        print('The door doesn\'t open, these marks will sure attract the authorities')
+                        self.turns_till_over -= 2
+                    elif self.item == 'key':
+                        print('The key doesn\'t fit the lock')
                     else:
-                        print('You have already unlocked the door')
+                        print(f'You can\'t use the {self.item} here')
+                else:
+                    print('You have already unlocked the door')
 
         else:
             print(f'You can\'t use the {self.item} here')
 
+    def enter_code(self):
+        if (self.plx, self.ply) == (0, 2):
+            if not (self.unlocked_lvls[4] or self.visited_vault):  # if you haven't unlocked the vault yet
+                code_guess = input('Enter code (or enter "cancel"): ')
+                if code_guess == self.vault_code:  # if the guess is correct
+                    self.unlocked_lvls[4] = True
+                    print('You hear a metal swinging sound in the distance, '
+                          'the words "Vault unlocked" appear on the screen')
+                elif 'cancel' in code_guess:  # if the player requested to cancel
+                    self.describe_area()
+                else:  # if the guess is incorrect
+                    print('Incorrect code, security called')
+                    self.turns_till_over -= 10
+            else:  # if the vault is already unlocked
+                    print('You have already unlocked the vault')
+        else:  # if you are not at the right location
+            print('You cannot enter the code here')
+
+    def read(self):
+        if self.item is None:
+            print('The read action takes the form of "read <item>"')
+
+        elif self.item not in self.inventory:
+            print(f'You do not have the "{self.item}" to read')
+
+        elif self.item == 'paper':
+            print(f'You unfold the paper and see the numbers {self.vault_code}')
+        else:
+            print(f'You cannot read the {self.item}')
+
     def print_inventory(self):  # prints the player's inventory separated by commas
         if not self.inventory and self.score == 0:  # if inventory is empty
-            print('There are no items in your inventory.')
+            print('There are no items in your inventory')
         else:
             if self.score == 0:
                 print('The items currently in your inventory are:')
@@ -324,7 +375,7 @@ class Game:
         print('The recognised actions are:')
         print(', '.join(self.actions))
 
-    def parse_inp(self):  # TODO
+    def parse_inp(self):
         response_list = self.response.lower().strip().split(' ')  # get a list of the words in the input
 
         try:
@@ -365,47 +416,16 @@ class Game:
             self.visited_vault = True
             self.plx, self.ply = 1, 0
 
+        elif any(x in self.response.lower() for x in ('code', 'enter')):
+            self.enter_code()
+
+        elif self.action == 'read':
+            self.read()
+
         else:
-            self.other_inps()
-
-    def other_inps(self):  # edge cases for specific actions
-        # enter code action
-        # if at counter and want to enter code
-        if (self.plx, self.ply) == (0, 2) and any(x in self.response.lower() for x in ('code', 'enter')):
-            if not (self.unlocked_lvls[4] or self.visited_vault):  # if you haven't unlocked the vault yet
-                code_guess = input('Enter code: ')
-                if code_guess == self.vault_code:
-                    self.unlocked_lvls[4] = True
-                    print('You hear a metal swinging sound in the distance, '
-                          'the words "Vault unlocked" appear on the screen')
-                elif 'cancel' in code_guess:
-                    self.describe_area()
-                else:
-                    print('Incorrect code, security called')
-                    self.turns_till_over -= 10
-            else:
-                print('You have already unlocked the vault')
-        elif 'paper' in self.inventory and 'read' in self.response:  # read paper action
-            print(f'You unfold the paper and see the numbers {self.vault_code}')
-
-        elif self.action not in self.actions:  # unrecognised action
             print(f'Action "{self.action}" not recognised')
 
     def main(self):
-        #     print('Welcome to Night of the Heist.')
-        #     sleep(1.5)
-        #     print('When you see the following line:')
-        #     sleep(1.5)
-        #     print('>')
-        #     sleep(1.5)
-        #     print('you are being prompted to input something.')
-        #     sleep(1.5)
-        #     print('''If at any point during the game you don't know what you are doing,
-        # you can simply input the phrase "help" when you are able to.''')
-        #     sleep(3)
-        #     print('''if you would like help now, enter the phrase "help",
-        # otherwise, if you know what you're doing, press enter.''')
-
         self.describe_area()
         while True:
             if self.turns_till_over <= 0:  # if you lost
