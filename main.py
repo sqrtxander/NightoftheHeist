@@ -66,7 +66,7 @@ class Game:
                         (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system '
                                 '(use by typing "enter code"), the entrance is to your right',
                         # level 2 descriptions
-                        (2, 3): 'You are in a crowded hallway, the entrance is below you, '
+                        (2, 3): 'You are in a crowded hallway, the entrance is to your left, '
                                 'there is an opening to your right',
                         (3, 3): 'You are in a crowded hallway, you manage to make out a vault door below you, '
                                 'the hallway continues to the left',
