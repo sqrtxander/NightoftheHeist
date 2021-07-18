@@ -40,26 +40,19 @@ class Game:
         self.response = None
         self.action = None
         self.item = None
-        self.inventory = ['paper']
+        self.inventory = []
         self.actions = ('help', 'inventory', 'actions', 'scan', 'walk', 'grab', 'drop', 'use', 'read', 'enter code')
         self.items = {(0, 0): ['wire', 'crowbar'], (1, 0): ['rock', 'key'],  # level 0 items
                       (1, 1): [], (1, 2): [], (1, 3): ['cloth'],  # level 1 items
                       (0, 2): ['backpack'],  # level 2 items
                       (2, 3): ['paper'], (3, 3): [],  # level 3 items
                       (3, 2): []}  # level 4 items
-        self.plx, self.ply = 0, 2  # player's x and y coordinates
+        self.plx, self.ply = 0, 0  # player's x and y coordinates
         self.unlocked_lvls = [True, False, False, False, False]
-
         self.vault_code = str(random.randint(0000, 9999)).zfill(4)  # generates a 4 digit code from 0000 to 9999
-
-        # print(self.vault_code)  # TODO delete
-
         self.turns_till_over = 50
-
         self.visited_vault = False
-
         self.score = 0
-        # self.wrong_till_over = 0
 
     def describe_area(self):  # describe area function prints the description of what is around you and what you see
         general_desc = {(0, 0): '''South west of bank''',
@@ -148,7 +141,6 @@ class Game:
             print('It will ask you what you want to use the item on')
             sleep(1)
             print('It allows you to complete sections of the game performing necessary actions to unlock new areas')
-            # TODO
 
         elif self.item in ['enter' 'code']:
             print('The enter code action takes the form of "enter code"')
@@ -344,7 +336,7 @@ class Game:
                     print('Incorrect code, security called')
                     self.turns_till_over -= 10
             else:  # if the vault is already unlocked
-                    print('You have already unlocked the vault')
+                print('You have already unlocked the vault')
         else:  # if you are not at the right location
             print('You cannot enter the code here')
 
@@ -409,13 +401,6 @@ class Game:
         elif self.action == 'use':
             self.use()
 
-        elif self.action == 'die':
-            self.turns_till_over = 0  # TODO delete this action
-
-        elif self.action == 'win':
-            self.visited_vault = True
-            self.plx, self.ply = 1, 0
-
         elif any(x in self.response.lower() for x in ('code', 'enter')):
             self.enter_code()
 
@@ -447,7 +432,6 @@ class Game:
                 sleep(1)
                 slow_print('YOU WIN', 0.75)
                 break
-
 
             self.response = input('> ')
             self.parse_inp()
