@@ -4,6 +4,19 @@ from time import sleep
 from math import ceil
 
 
+def intro_text():
+    print('Welcome to Night of the Heist, A game by Xander')
+    sleep(3)
+    print('It is midnight and you are about to rob a bank')
+    sleep(2)
+    print('You roll up in your car and prepare to get out')
+    sleep(2)
+    print('At any point during the game, you can use the "help" action')
+    sleep(2)
+    print('Get ready')
+    sleep(3)
+
+
 def slow_print(text, delay):
     for char in text:
         print(char, end='')
@@ -440,6 +453,7 @@ class Game:
 
 if __name__ == '__main__':
 
+    intro_text()
     while True:
         game = Game()
         game.main()
