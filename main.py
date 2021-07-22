@@ -454,6 +454,9 @@ class Game:
 if __name__ == '__main__':
 
     intro_text()
+    print('================================================================')
+    sleep(1)
+
     while True:
         game = Game()
         game.main()
