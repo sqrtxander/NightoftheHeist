@@ -72,16 +72,17 @@ class Game:
                         (1, 0): 'South of bank, there is a door above you',
                         # level 0 descriptions
                         (1, 1): 'Entrance of bank, there is a pathway above you, the door is below you',
-                        (1, 2): 'Entrance of bank, the counter is on your left, there are walkways above and below you',
+                        (1, 2): 'Entrance of bank, there is a door that says "Authorised personnel only" on your left, '
+                                'there are walkways above and below you',
                         (1, 3): 'Entrance of bank, there is a hallway to the right of you, '
                                 'there is a walkway below you',
                         # level 1 descriptions
-                        (0, 2): 'You are behind the counter, there is a keypad with a 4 digit code entry system '
-                                '(use by typing "enter code"), the entrance is to your right',
+                        (0, 2): 'You are in the authorised personnel only zone, '
+                                'there is a keypad with a 4 digit code entry system, the entrance is to your right',
                         # level 2 descriptions
-                        (2, 3): 'You are in a crowded hallway, the entrance is to your left, '
+                        (2, 3): 'You are in a narrow hallway, the entrance is to your left, '
                                 'there is an opening to your right',
-                        (3, 3): 'You are in a crowded hallway, you manage to make out a vault door below you, '
+                        (3, 3): 'You are in a narrow hallway, you manage to make out a vault door below you, '
                                 'the hallway continues to the left',
                         # level 3 descriptions
                         (3, 2): 'You are in the vault, money is scattered everywhere, the door is above you'
@@ -119,15 +120,16 @@ class Game:
             sleep(1)
             print('You are being prompted to type something')
 
-        elif self.item not in self.actions:
-            print(f'Action "{self.item}" not recognised')
-
-        elif self.item == 'walk':
+        elif self.item in ('walk', 'go'):
             print('The walk action takes the form of "walk <direction>"')
             sleep(1)
-            print('The valid directions are "North", "East", "South", and "West"')
+            print('The valid directions are "north", "east", "south", and "west"')
+            sleep(1)
+            print('You can also use "up", "right", "down", and "left", or "N", "E", "S", and "W"')
+            sleep(1)
+            print('You are controlling your character from a birds eye point of view i.e. you are always facing North')
 
-        elif self.item == 'grab':
+        elif self.item in ('grab', 'get'):
             print('The grab action takes the form of "grab <item>"')
             sleep(1)
             print('The items that are around you are told to you after walking or alternatively you can use the '
@@ -155,10 +157,10 @@ class Game:
             sleep(1)
             print('It allows you to complete sections of the game performing necessary actions to unlock new areas')
 
-        elif self.item in ['enter' 'code']:
+        elif self.item in ('enter', 'code'):
             print('The enter code action takes the form of "enter code"')
             sleep(1)
-            print('You are only able to use it when you are behind the counter')
+            print('You are only able to use it when you are in the authorised personnel only zone')
             sleep(1)
             print('You will be asked to enter the code or to cancel')
 
@@ -174,6 +176,9 @@ class Game:
             sleep(1)
             print('It will tell you how the action is used and what it does')
 
+        elif self.item not in self.actions:
+            print(f'Action "{self.item}" not recognised')
+
     def walk(self):
         map_spaces = {(0, 0): 0, (1, 0): 0,
                       (1, 1): 1, (1, 2): 1, (1, 3): 1,
@@ -182,7 +187,8 @@ class Game:
                       (3, 2): 4}
 
         dirs = {'north': (0, 1), 'east': (1, 0), 'south': (0, -1), 'west': (-1, 0),
-                'up': (0, 1), 'right': (1, 0), 'down': (0, -1), 'left': (-1, 0)}
+                'up': (0, 1), 'right': (1, 0), 'down': (0, -1), 'left': (-1, 0),
+                'n': (0, 1), 'e': (1, 0), 's': (0, -1), 'w': (-1, 0)}
 
         if self.item is None:
             print('This action is used in the form "walk <direction>"')
@@ -285,7 +291,7 @@ class Game:
                         self.unlocked_lvls[1] = True
                         self.unlocked_lvls[3] = True
                     elif self.item == 'crowbar':
-                        print('The door doesn\'t open, these marks will sure attract the authorities')
+                        print('The door doesn\'t open, these marks will surely attract the authorities')
                         self.turns_till_over -= 2
                     elif self.item == 'key':
                         print('The key doesn\'t fit the lock')
@@ -294,26 +300,26 @@ class Game:
                 else:
                     print('You have already unlocked the door')
 
-        elif (self.plx, self.ply) == (1, 2):
+        elif (self.plx, self.ply) == (1, 2):  # unlocking the authorised personnel only door
             if not self.visited_vault:
-                if any(x in obj for x in ('counter', 'door', 'lock')):
+                if any(x in obj for x in ('door', 'lock')):
                     if not self.unlocked_lvls[2]:
                         if self.item == 'key':
-                            print('The key worked, the counter is open')
+                            print('The key worked, the door is open')
                             self.unlocked_lvls[2] = True
                         elif self.item == 'crowbar':
-                            print('Maybe it\'s best not to make such a loud sound. The counter remains locked')
+                            print('Maybe it\'s best not to make such a loud sound. The door remains locked')
                             self.turns_till_over -= 2
                         else:
-                            print(f'You can\'t use {self.item} here')
+                            print(f'You can\'t use the {self.item} here')
                     else:
                         print('You have already unlocked this area')
                 else:
                     print(f'You can\'t use the {self.item} here')
             if self.visited_vault:
-                if any(x in obj for x in ('counter', 'door', 'lock')):
+                if any(x in obj for x in ('door', 'lock')):
                     if self.item == 'cloth':
-                        print('You wipe your fingerprints off the counter')
+                        print('You wipe your fingerprints off the keyhole')
                         self.turns_till_over += 10
 
         elif (self.plx, self.ply) == (1, 1) and self.visited_vault:
@@ -323,7 +329,7 @@ class Game:
                         print('You manage to pick the lock. The door creaks open')
                         self.unlocked_lvls[0] = True
                     elif self.item == 'crowbar':
-                        print('The door doesn\'t open, these marks will sure attract the authorities')
+                        print('The door doesn\'t open, these marks will surely attract the authorities')
                         self.turns_till_over -= 2
                     elif self.item == 'key':
                         print('The key doesn\'t fit the lock')
@@ -405,16 +411,16 @@ class Game:
         elif self.action == 'drop':
             self.drop()
 
-        elif self.action == 'walk':
+        elif self.action in ('walk', 'go'):
             self.walk()
 
-        elif self.action == 'grab':
+        elif self.action in ('grab', 'get'):
             self.grab()
 
         elif self.action == 'use':
             self.use()
 
-        elif any(x in self.response.lower() for x in ('code', 'enter')):
+        elif any(x in self.response.lower() for x in ('code', 'enter')):  # if user wants to enter the code
             self.enter_code()
 
         elif self.action == 'read':
