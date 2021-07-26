@@ -214,6 +214,7 @@ class Game:
 
         if (self.plx, self.ply) == (3, 2):  # if player is in the vault
             if self.unlocked_lvls[0]:  # if the outside area is unlocked
+                sleep(1)
                 print('You hear the sound of the entrance slamming shut')
                 self.unlocked_lvls[0] = False  # locks the outside area
             self.visited_vault = True
@@ -296,7 +297,7 @@ class Game:
                     elif self.item == 'key':
                         print('The key doesn\'t fit the lock')
                     else:
-                        print(f'You can\'t use the {self.item} here')
+                        print(f'You can\'t use the {self.item} on the {obj}')
                 else:
                     print('You have already unlocked the door')
 
@@ -311,17 +312,20 @@ class Game:
                             print('Maybe it\'s best not to make such a loud sound. The door remains locked')
                             self.turns_till_over -= 2
                         else:
-                            print(f'You can\'t use the {self.item} here')
+                            print(f'You can\'t use the {self.item} on the {obj}')
                     else:
                         print('You have already unlocked this area')
                 else:
-                    print(f'You can\'t use the {self.item} here')
+                    print(f'You can\'t use the {self.item} on the {obj}')
             if self.visited_vault:
                 if any(x in obj for x in ('door', 'lock')):
                     if self.item == 'cloth':
                         print('You wipe your fingerprints off the keyhole')
                         self.turns_till_over += 10
-
+                    else:
+                        print(f'You can\'t use the {self.item} on the {obj}')
+                else:
+                    print(f'You can\'t use the {self.item} on the {obj}')
         elif (self.plx, self.ply) == (1, 1) and self.visited_vault:
             if any(x in obj for x in ('door', 'lock')):  # if obj is door or lock
                 if not self.unlocked_lvls[0]:  # if level 0 not unlocked
@@ -334,12 +338,12 @@ class Game:
                     elif self.item == 'key':
                         print('The key doesn\'t fit the lock')
                     else:
-                        print(f'You can\'t use the {self.item} here')
+                        print(f'You can\'t use the {self.item} on the {obj}')
                 else:
                     print('You have already unlocked the door')
 
         else:
-            print(f'You can\'t use the {self.item} here')
+            print(f'You can\'t use the {self.item} on the {obj}')
 
     def enter_code(self):
         if (self.plx, self.ply) == (0, 2):
