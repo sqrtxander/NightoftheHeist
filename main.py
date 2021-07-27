@@ -215,7 +215,7 @@ class Game:
         if (self.plx, self.ply) == (3, 2):  # if player is in the vault
             if self.unlocked_lvls[0]:  # if the outside area is unlocked
                 sleep(1)
-                print('You hear the sound of the entrance slamming shut')
+                print('You hear the sound of the entrance to the bank slamming shut')
                 self.unlocked_lvls[0] = False  # locks the outside area
             self.visited_vault = True
 
