@@ -69,23 +69,23 @@ class Game:
 
     def describe_area(self):  # describe area function prints the description of what is around you and what you see
         general_desc = {(0, 0): '''South west of bank''',
-                        (1, 0): 'South of bank, there is a door above you',
+                        (1, 0): 'South of bank, there is a door in front of you',
                         # level 0 descriptions
-                        (1, 1): 'Entrance of bank, there is a pathway above you, the door is below you',
+                        (1, 1): 'Entrance of bank, there is a pathway in front of you, the door is behind you',
                         (1, 2): 'Entrance of bank, there is a door that says "Authorised personnel only" on your left, '
-                                'there are walkways above and below you',
+                                'there are walkways in front of and behind you',
                         (1, 3): 'Entrance of bank, there is a hallway to the right of you, '
-                                'there is a walkway below you',
+                                'there is a walkway behind you',
                         # level 1 descriptions
                         (0, 2): 'You are in the authorised personnel only zone, '
                                 'there is a keypad with a 4 digit code entry system, the entrance is to your right',
                         # level 2 descriptions
                         (2, 3): 'You are in a narrow hallway, the entrance is to your left, '
                                 'there is an opening to your right',
-                        (3, 3): 'You are in a narrow hallway, you manage to make out a vault door below you, '
+                        (3, 3): 'You are in a narrow hallway, you manage to make out a vault door behind you, '
                                 'the hallway continues to the left',
                         # level 3 descriptions
-                        (3, 2): 'You are in the vault, money is scattered everywhere, the door is above you'
+                        (3, 2): 'You are in the vault, money is scattered everywhere, the door is in front of you'
                         }  # level 4 descriptions
 
         # takes list and puts it in the form 'a 0, a 1, a 2 and a 3'
@@ -94,7 +94,6 @@ class Game:
             items_str = items_list[0]
         elif len(items_list) == 0:
             items_str = 'nothing'
-
         else:
             items_str = ', '.join(items_list[:-1]) + ' and ' + items_list[-1]
 
